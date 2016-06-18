@@ -17,18 +17,20 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <OutputPath>..\..\..\..\..\..\bin\Debug\Libraries\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;PLATFORM_DESKTOP</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>..\..\..\..\..\..\bin\Debug\Libraries\Fusee.Engine.Imp.Input.NatNet.Desktop.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <OutputPath>..\..\..\..\..\..\bin\Release\Libraries\</OutputPath>
+    <DefineConstants>TRACE;PLATFORM_DESKTOP</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>..\..\..\..\..\..\bin\Release\Libraries\Fusee.Engine.Imp.Input.NatNet.Desktop.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="NatNetML">
