@@ -356,6 +356,13 @@ namespace Fusee.Engine.Core
         }
 
         [VisitMethod]
+        public void RenderTransform(RectTransformComponent rectTransform)
+        {
+            _state.Model *= rectTransform.Matrix();
+            _rc.Model = _view * _state.Model;
+        }
+
+        [VisitMethod]
         public void RenderMaterial(MaterialComponent matComp)
         {
             var effect = LookupMaterial(matComp);
