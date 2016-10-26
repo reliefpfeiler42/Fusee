@@ -31,7 +31,7 @@ namespace Fusee.Xene
         {
             return float4x4.CreateTranslation(rtcThis.Translation) * float4x4.CreateRotationY(rtcThis.Rotation.y) *
                    float4x4.CreateRotationX(rtcThis.Rotation.x) * float4x4.CreateRotationZ(rtcThis.Rotation.z) *
-                   float4x4.CreateScale(rtcThis.Width, rtcThis.Height, rtcThis.Scale.z);
+                   float4x4.CreateScale(rtcThis.Scale);
         }
 
         /// <summary>
