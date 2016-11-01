@@ -176,10 +176,19 @@ namespace Fusee.Engine.Core
                 get { return _effect.Tos; }
             }
 
+            // TODO Nachfragen weil nicht sicher
+            private StateStack<RectTransformComponent> _rect = new StateStack<RectTransformComponent>();
+            public RectTransformComponent Rect
+            {
+                set { _rect.Tos = value; }
+                get { return _rect.Tos; }
+            }
+
             public RendererState()
             {
                 RegisterState(_model);
                 RegisterState(_effect);
+                RegisterState(_rect);
             }
         };
 
@@ -355,10 +364,12 @@ namespace Fusee.Engine.Core
             _rc.Model = _view * _state.Model;
         }
 
+        // TODO WIP
         [VisitMethod]
         public void RenderTransform(RectTransformComponent rectTransform)
         {
             _state.Model *= rectTransform.Matrix();
+            //_state.Rect
             _rc.Model = _view * _state.Model;
         }
 
