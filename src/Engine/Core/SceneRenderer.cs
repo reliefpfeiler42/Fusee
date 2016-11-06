@@ -176,21 +176,26 @@ namespace Fusee.Engine.Core
                 get { return _effect.Tos; }
             }
 
-            // TODO Nachfragen weil nicht sicher
-            private StateStack<RectTransformComponent> _rect = new StateStack<RectTransformComponent>();
-            public RectTransformComponent Rect
+            private StateStack<CanvasData> _canvas = new StateStack<CanvasData>();
+            public CanvasData Canvas
             {
-                set { _rect.Tos = value; }
-                get { return _rect.Tos; }
+                set { _canvas.Tos = value; }
+                get { return _canvas.Tos; }
             }
 
             public RendererState()
             {
                 RegisterState(_model);
                 RegisterState(_effect);
-                RegisterState(_rect);
+                RegisterState(_canvas);
             }
         };
+
+        public struct CanvasData
+        {
+            private float Width;
+            private float Height;
+        }
 
         private RendererState _state;
         private float4x4 _view;
@@ -369,7 +374,7 @@ namespace Fusee.Engine.Core
         public void RenderTransform(RectTransformComponent rectTransform)
         {
             _state.Model *= rectTransform.Matrix();
-            //_state.Rect
+            // _state.Canvas 
             _rc.Model = _view * _state.Model;
         }
 
