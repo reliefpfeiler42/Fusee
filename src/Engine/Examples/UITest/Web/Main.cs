@@ -5,7 +5,7 @@ using Fusee.Serialization;
 
 namespace Fusee.Engine.Examples.UITest.Web
 {
-    public class Simple
+    public class UITest
     {
         public static void Main()
         {

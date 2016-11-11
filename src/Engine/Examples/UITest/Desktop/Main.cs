@@ -9,7 +9,7 @@ using Path = Fusee.Base.Common.Path;
 
 namespace Fusee.Engine.Examples.UITest.Desktop
 {
-    public class Simple
+    public class UITest
     {
         public static void Main()
         {

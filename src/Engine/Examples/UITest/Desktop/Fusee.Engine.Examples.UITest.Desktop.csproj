@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <RootNamespace>Fusee.Engine.Examples.Simple.Desktop</RootNamespace>
-    <AssemblyName>Fusee.Engine.Examples.Simple.Desktop</AssemblyName>
+    <RootNamespace>Fusee.Engine.Examples.UITest.Desktop</RootNamespace>
+    <AssemblyName>Fusee.Engine.Examples.UITest.Desktop</AssemblyName>
     <FuseeBuildRoot Condition=" '$(FuseeBuildRoot)' == '' ">..\..\..\..\..</FuseeBuildRoot>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -88,9 +88,9 @@
       <Project>{f7ad2bb5-d2b0-4697-bddb-4cc26152a6b6}</Project>
       <Name>Fusee.Engine.Imp.Graphics.Desktop</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Simple\Core\Fusee.Engine.Examples.Simple.Core.csproj">
-      <Project>{c4157bcb-d3a0-45c6-a84b-735fbd8c7aa8}</Project>
-      <Name>Fusee.Engine.Examples.Simple.Core</Name>
+    <ProjectReference Include="..\Core\Fusee.Engine.Examples.UITest.Core.csproj">
+      <Project>{4dcf1ee0-67c7-482b-8934-880cb2a52d3c}</Project>
+      <Name>Fusee.Engine.Examples.UITest.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
