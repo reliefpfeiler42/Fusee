@@ -193,8 +193,8 @@ namespace Fusee.Engine.Core
 
         public struct CanvasData
         {
-            private float Width;
-            private float Height;
+            public float Width;
+            public float Height;
         }
 
         private RendererState _state;
@@ -373,9 +373,16 @@ namespace Fusee.Engine.Core
         [VisitMethod]
         public void RenderTransform(RectTransformComponent rectTransform)
         {
-            _state.Model *= rectTransform.Matrix();
-            // _state.Canvas 
-            _rc.Model = _view * _state.Model;
+            _rc.Model *= float4x4.CreateScale(rectTransform.Width / 2, rectTransform.Height / 2, 0);
+
+            var canvas = new CanvasData
+            {
+                Height = rectTransform.Height,
+                Width = rectTransform.Width
+            };
+            _state.Canvas = canvas;
+
+            
         }
 
         [VisitMethod]

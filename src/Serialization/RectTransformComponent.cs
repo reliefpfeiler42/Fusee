@@ -11,7 +11,7 @@ namespace Fusee.Serialization
     /// Transformation (position, orientation and size) of the node.
     /// </summary>
     [ProtoContract]
-    public class RectTransformComponent
+    public class RectTransformComponent : SceneComponentContainer
     {
         /// <summary>
         /// The translation (position) of the node.

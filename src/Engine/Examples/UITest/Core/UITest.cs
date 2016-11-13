@@ -2,12 +2,14 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using Fusee.Base.Common;
 using Fusee.Base.Core;
 using Fusee.Engine.Common;
 using Fusee.Engine.Core;
 using Fusee.Math.Core;
 using Fusee.Serialization;
+using Fusee.Xene;
 using static Fusee.Engine.Core.Input;
 using static Fusee.Engine.Core.Time;
 #if GUI_SIMPLE
@@ -26,8 +28,13 @@ namespace Fusee.Engine.Examples.UITest.Core
         private const float RotationSpeed = 7;
         private const float Damping = 0.8f;
 
+        private Mesh _canvasMesh;
+        private Mesh _buttonMesh;
+
         private SceneContainer _rocketScene;
+        private SceneContainer _cube;
         private SceneRenderer _sceneRenderer;
+        private SceneRenderer _sceneRenderer2;
 
         private bool _keys;
 
@@ -74,9 +81,34 @@ namespace Fusee.Engine.Examples.UITest.Core
 
             // Load the rocket model
             _rocketScene = AssetStorage.Get<SceneContainer>("RocketModel.fus");
+            // Load the cube model
+            _cube = AssetStorage.Get<SceneContainer>("Cube.fus");
+
+            // Scale the cube model
+            var transComp = _cube.Children[0].GetComponent<TransformComponent>();
+            transComp.Scale = new float3(100,100,100);
+            _cube.Children[0].Components[0] = transComp;
+
+            // add Width and Height to the cube
+            var rectTrans = new RectTransformComponent {Width = 200f, Height = 100f};
+            _cube.Children[0].AddComponent(rectTrans);
 
             // Wrap a SceneRenderer around the model.
             _sceneRenderer = new SceneRenderer(_rocketScene);
+            _sceneRenderer2 = new SceneRenderer(_cube);
+
+        }
+
+        public static Mesh LoadMesh(string assetName)
+        {
+            SceneContainer sc = AssetStorage.Get<SceneContainer>(assetName);
+            MeshComponent mc = sc.Children.FindComponents<MeshComponent>(c => true).First();
+            return new Mesh
+            {
+                Vertices = mc.Vertices,
+                Normals = mc.Normals,
+                Triangles = mc.Triangles
+            };
         }
 
         // RenderAFrame is called once a frame
@@ -129,8 +161,11 @@ namespace Fusee.Engine.Examples.UITest.Core
             var mtxCam = float4x4.LookAt(0, 20, -600, 0, 150, 0, 0, 1, 0);
             RC.ModelView = mtxCam * mtxRot;
 
+            
+
             // Render the scene loaded in Init()
             _sceneRenderer.Render(RC);
+            _sceneRenderer2.Render(RC);
 
             #if GUI_SIMPLE
             _guiHandler.RenderGUI();
