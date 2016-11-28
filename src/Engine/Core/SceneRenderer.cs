@@ -373,7 +373,7 @@ namespace Fusee.Engine.Core
         [VisitMethod]
         public void RenderTransform(RectTransformComponent rectTransform)
         {
-            _rc.Model *= float4x4.CreateScale(rectTransform.Width / 2, rectTransform.Height / 2, 0);
+            //_rc.Model *= float4x4.CreateScale(rectTransform.Width / 2, rectTransform.Height / 2, 0);
 
             var canvas = new CanvasData
             {
@@ -381,6 +381,10 @@ namespace Fusee.Engine.Core
                 Width = rectTransform.Width
             };
             _state.Canvas = canvas;
+
+            // TODO Width und Height in Matrix einberechnen
+
+            // TODO Hier Formel implementieren
 
             
         }
