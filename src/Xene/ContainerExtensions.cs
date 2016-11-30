@@ -27,11 +27,11 @@ namespace Fusee.Xene
         /// </summary>
         /// <param name="rtcThis">This rect transform component.</param>
         /// <returns>The rect transform component's translation, rotation, scale, width and height combined in a single matrix.</returns>
-        public static float4x4 Matrix(this RectTransformComponent rtcThis)
+        public static float4x4 RectMatrix(this RectTransformComponent rtcThis)
         {
-            return float4x4.CreateTranslation(rtcThis.Translation) * float4x4.CreateRotationY(rtcThis.Rotation.y) *
-                   float4x4.CreateRotationX(rtcThis.Rotation.x) * float4x4.CreateRotationZ(rtcThis.Rotation.z) *
-                   float4x4.CreateScale(rtcThis.Scale);
+            return float4x4.CreateTranslation(rtcThis.Translation)*float4x4.CreateRotationY(rtcThis.Rotation.y)*
+                   float4x4.CreateRotationX(rtcThis.Rotation.x)*float4x4.CreateRotationZ(rtcThis.Rotation.z)*
+                   float4x4.CreateScale(rtcThis.Width) * float4x4.CreateScale(rtcThis.Scale);
         }
 
         /// <summary>

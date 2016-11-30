@@ -373,20 +373,39 @@ namespace Fusee.Engine.Core
         [VisitMethod]
         public void RenderTransform(RectTransformComponent rectTransform)
         {
-            //_rc.Model *= float4x4.CreateScale(rectTransform.Width / 2, rectTransform.Height / 2, 0);
+            _rc.Model *= float4x4.CreateScale(rectTransform.Width / 2, rectTransform.Height / 2, 0);
 
             var canvas = new CanvasData
             {
                 Height = rectTransform.Height,
                 Width = rectTransform.Width
             };
-            _state.Canvas = canvas;
-
+            _state.Canvas = canvas;          
+                  
+            
             // TODO Width und Height in Matrix einberechnen
 
             // TODO Hier Formel implementieren
+            // absolut Left
+            var aMinX = rectTransform.AnchorMinX;
+            var left = rectTransform.Left;
+            var AbsLeft = (canvas.Width * aMinX) + left;
 
-            
+            // absolut Right
+            var aMaxX = rectTransform.AnchorMaxX;
+            var right = rectTransform.Right;
+            var AbsRight = (canvas.Width * aMaxX) - right;
+
+            // absolut Bottom
+            var aMinY = rectTransform.AnchorMinY;
+            var bottom = rectTransform.Bottom;
+            var AbsBottom = (canvas.Height * aMinY) + bottom;
+
+            // absolut Top
+            var aMaxY = rectTransform.AnchorMaxY;
+            var top = rectTransform.Top;
+            var AbsTop = (canvas.Height * aMaxY) - top;
+
         }
 
         [VisitMethod]

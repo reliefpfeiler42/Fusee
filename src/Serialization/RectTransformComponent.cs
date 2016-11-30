@@ -47,13 +47,25 @@ namespace Fusee.Serialization
         /// 
         /// </summary>
         [ProtoMember(6)]
-        public float2 AnchorMin;
+        public float AnchorMinX;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [ProtoMember(6)]
+        public float AnchorMaxX;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [ProtoMember(6)]
+        public float AnchorMinY;
 
         /// <summary>
         /// 
         /// </summary>
         [ProtoMember(7)]
-        public float2 AnchorMax;
+        public float AnchorMaxY;
 
         /// <summary>
         /// 
