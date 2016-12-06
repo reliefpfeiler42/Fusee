@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Xml;
 using Fusee.Math.Core;
 using Fusee.Serialization;
 
@@ -29,9 +31,11 @@ namespace Fusee.Xene
         /// <returns>The rect transform component's translation, rotation, scale, width and height combined in a single matrix.</returns>
         public static float4x4 RectMatrix(this RectTransformComponent rtcThis)
         {
+            Debug.WriteLine(rtcThis.Width);
+            Debug.WriteLine(rtcThis.Height);
             return float4x4.CreateTranslation(rtcThis.Translation)*float4x4.CreateRotationY(rtcThis.Rotation.y)*
-                   float4x4.CreateRotationX(rtcThis.Rotation.x)*float4x4.CreateRotationZ(rtcThis.Rotation.z)*
-                   float4x4.CreateScale(rtcThis.Width) * float4x4.CreateScale(rtcThis.Scale);
+                   float4x4.CreateRotationX(rtcThis.Rotation.x)*float4x4.CreateRotationZ(rtcThis.Rotation.z) *
+                   float4x4.CreateScale(rtcThis.Scale);
         }
 
         /// <summary>

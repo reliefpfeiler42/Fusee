@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Fusee.Base.Common;
 using Fusee.Base.Core;
@@ -371,9 +372,11 @@ namespace Fusee.Engine.Core
 
         // TODO WIP
         [VisitMethod]
-        public void RenderTransform(RectTransformComponent rectTransform)
+        public void RenderRectTransform(RectTransformComponent rectTransform)
         {
-            _rc.Model *= float4x4.CreateScale(rectTransform.Width / 2, rectTransform.Height / 2, 0);
+            
+            //_state.Model *= rectTransform.RectMatrix();
+            _rc.Model *= float4x4.CreateScale(rectTransform.Width, rectTransform.Height, 0);
 
             var canvas = new CanvasData
             {
@@ -381,30 +384,28 @@ namespace Fusee.Engine.Core
                 Width = rectTransform.Width
             };
             _state.Canvas = canvas;          
-                  
-            
+                              
             // TODO Width und Height in Matrix einberechnen
-
-            // TODO Hier Formel implementieren
+           
             // absolut Left
             var aMinX = rectTransform.AnchorMinX;
             var left = rectTransform.Left;
-            var AbsLeft = (canvas.Width * aMinX) + left;
+            var absLeft = (canvas.Width * aMinX) + left;
 
             // absolut Right
             var aMaxX = rectTransform.AnchorMaxX;
             var right = rectTransform.Right;
-            var AbsRight = (canvas.Width * aMaxX) - right;
+            var absRight = (canvas.Width * aMaxX) - right;
 
             // absolut Bottom
             var aMinY = rectTransform.AnchorMinY;
             var bottom = rectTransform.Bottom;
-            var AbsBottom = (canvas.Height * aMinY) + bottom;
+            var absBottom = (canvas.Height * aMinY) + bottom;
 
             // absolut Top
             var aMaxY = rectTransform.AnchorMaxY;
             var top = rectTransform.Top;
-            var AbsTop = (canvas.Height * aMaxY) - top;
+            var absTop = (canvas.Height * aMaxY) - top;
 
         }
 
