@@ -25,11 +25,14 @@ namespace Fusee.Engine.Examples.UITest.Core
         private const float RotationSpeed = 7;
         private const float Damping = 0.8f;
 
-        private Mesh _canvasMesh;
+        private Mesh _mesh;
+        private Mesh _cubeMesh;
         private Mesh _buttonMesh;
        
-        private SceneContainer _cube;       
+        private SceneContainer _cube;
+        private SceneContainer _canvas;
         private SceneRenderer _sceneRenderer;
+        private SceneRenderer _canvasRenderer;
         private float4x4 _sceneScale;
 
         private bool _keys;
@@ -39,17 +42,52 @@ namespace Fusee.Engine.Examples.UITest.Core
         {
             // Set the clear color for the backbuffer to white (100% intentsity in all color channels R, G, B, A).
             RC.ClearColor = new float4(1, 1, 1, 1);
-        
+            /*
+            _mesh = new Mesh
+            {
+                Vertices = new[]
+                {
+                    new float3(-0.8165f, -0.3333f, -0.4714f),   // Vertex 0
+                    new float3(0.8165f, -0.3333f, -0.4714f),    // Vertex 1
+                    new float3(0, -0.3333f, 0.9428f),           // Vertex 2
+                    new float3(0, 1, 0),                        // Vertex 3
+                    new float3(-0.8165f, -1.3333f, -0.4714f),   // Vertex 4
+                    new float3(0.8165f, -1.3333f, -0.4714f),    // Vertex 5
+                    new float3(0, -1.3333f, 0.9428f)            // Vertex 6
+                },
+                Triangles = new ushort[] 
+                {
+                    0, 2, 1,  // Triangle 0 "Bottom" facing towards negative y axis
+                    0, 1, 3,  // Triangle 1 "Back side" facing towards negative z axis
+                    1, 2, 3,  // Triangle 2 "Right side" facing towards positive x axis
+                    2, 0, 3,  // Triangle 3 "Left side" facing towrads negative x axis
+                    0, 4, 5,
+                    1, 0, 5,
+                    1, 5, 6,
+                    2, 1, 6,
+                    4, 0, 2,
+                    6, 4, 2,},
+            };
+            */
             // Load the cube model
-            _cube = AssetStorage.Get<SceneContainer>("Cube.fus");
-            _sceneScale = float4x4.CreateScale(1, 2, 1);
+            _cubeMesh = LoadMesh("Cube.fus");
+            //_cube = AssetStorage.Get<SceneContainer>("Cube.fus");
+            //_sceneScale = float4x4.CreateScale(1, 2, 1);
             
             // add Width and Height to the cube
-            var rectTrans = new RectTransformComponent {Width = 200f, Height = 100f};
+            var rectTrans = new RectTransformComponent {Scale = new float3(1, 1, 1), Width = 20f, Height = 10f};
             _cube.Children[0].AddComponent(rectTrans);
-
+            /*
+            var meshComp = new MeshComponent
+            {
+                Vertices = _mesh.Vertices,
+                Triangles = _mesh.Triangles
+            };
+            _canvas.Children[0].AddComponent(meshComp);
+            */
             // Wrap a SceneRenderer around the model.           
             _sceneRenderer = new SceneRenderer(_cube);
+            //_canvasRenderer = new SceneRenderer(_canvas);
         }
 
         public static Mesh LoadMesh(string assetName)
@@ -111,11 +149,13 @@ namespace Fusee.Engine.Examples.UITest.Core
             // Create the camera matrix and set it as the current ModelView transformation
             var mtxRot = float4x4.CreateRotationX(_angleVert) * float4x4.CreateRotationY(_angleHorz);
             var mtxCam = float4x4.LookAt(0, 5, -5, 0, 0, 0, 0, 1, 0);
-            RC.ModelView = mtxCam * mtxRot * _sceneScale;
+            RC.ModelView = mtxCam * mtxRot  /*_sceneScale*/;
 
             // Render the scene loaded in Init()
-            _sceneRenderer.Render(RC);
+            //_sceneRenderer.Render(RC);
             //_sceneRenderer.Traverse();
+            _canvasRenderer.Render(RC);
+            
 
             // Swap buffers: Show the contents of the backbuffer (containing the currently rerndered farame) on the front buffer.
             Present();

@@ -374,9 +374,11 @@ namespace Fusee.Engine.Core
         [VisitMethod]
         public void RenderRectTransform(RectTransformComponent rectTransform)
         {
-            
+            _state.Model *= rectTransform.RectMatrix();
+            _rc.Model = _view * _state.Model;
+
             //_state.Model *= rectTransform.RectMatrix();
-            _rc.Model *= float4x4.CreateScale(rectTransform.Width, rectTransform.Height, 0);
+            //_rc.Model *= float4x4.CreateScale(rectTransform.Width, rectTransform.Height, 0);
 
             var canvas = new CanvasData
             {
