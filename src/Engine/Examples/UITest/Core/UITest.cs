@@ -1,6 +1,7 @@
 ﻿#define GUI_SIMPLE
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Fusee.Base.Common;
@@ -28,20 +29,28 @@ namespace Fusee.Engine.Examples.UITest.Core
         private Mesh _mesh;
         private Mesh _cubeMesh;
         private Mesh _buttonMesh;
-       
+
+
+        private Cube _myCube;
+        private MeshComponent _myCubeMeshComponent;
+
         private SceneContainer _cube;
         private SceneContainer _canvas;
+        private SceneNodeContainer _myCubeNodeContainer;
+        private TransformComponent _myTransformComponent;
         private SceneRenderer _sceneRenderer;
         private SceneRenderer _canvasRenderer;
         private float4x4 _sceneScale;
 
         private bool _keys;
-        
+        private MaterialComponent _myMaterialComponent;
+
+
         // Init is called on startup. 
         public override void Init()
         {
             // Set the clear color for the backbuffer to white (100% intentsity in all color channels R, G, B, A).
-            RC.ClearColor = new float4(1, 1, 1, 1);
+            RC.ClearColor = new float4(0.3f, 0.3f, 0.3f, 1);
             /*
             _mesh = new Mesh
             {
@@ -70,13 +79,14 @@ namespace Fusee.Engine.Examples.UITest.Core
             };
             */
             // Load the cube model
-            _cubeMesh = LoadMesh("Cube.fus");
-            //_cube = AssetStorage.Get<SceneContainer>("Cube.fus");
+            //_cubeMesh = LoadMesh("Cube.fus");
+            _cube = AssetStorage.Get<SceneContainer>("Cube.fus");
             //_sceneScale = float4x4.CreateScale(1, 2, 1);
             
             // add Width and Height to the cube
-            var rectTrans = new RectTransformComponent {Scale = new float3(1, 1, 1), Width = 20f, Height = 10f};
+            var rectTrans = new RectTransformComponent {Scale = float3.One * 0.2f, Width = 30f, Height = 40f};
             _cube.Children[0].AddComponent(rectTrans);
+            
             /*
             var meshComp = new MeshComponent
             {
@@ -85,9 +95,99 @@ namespace Fusee.Engine.Examples.UITest.Core
             };
             _canvas.Children[0].AddComponent(meshComp);
             */
+            
+            
+            _myCube = new Cube();           
+            _myCubeMeshComponent = new MeshComponent
+            {
+                Vertices = _myCube.Vertices,
+                Triangles = _myCube.Triangles,
+                Normals = _myCube.Normals
+
+            };
+
+            _myTransformComponent = new TransformComponent
+            {
+                Rotation = float3.Zero,
+                Scale = float3.One * 0.1f,
+                Translation = float3.Zero
+            };
+
+            _myMaterialComponent = new MaterialComponent
+            {
+                Diffuse = new MatChannelContainer
+                {
+                    Color = new float3(1.0f,0.3f,0.30f),
+                },
+                Specular = new SpecularChannelContainer
+                {
+                    Color = float3.One,
+                    Shininess = 0.5f,
+                    Intensity = 0.8f
+                }
+            };
+            /*
+            // Neuer SceneContainer - root element
+            _canvas = new SceneContainer
+            {
+                Children = new List<SceneNodeContainer>(),
+                Header = new SceneHeader
+                {
+                    CreatedBy = "Patrick",
+                    CreationDate = "10.12.2016"
+                }
+            };
+
+            // Neuer SceneNodeContainer
+            _myCubeNodeContainer = new SceneNodeContainer
+            {
+                Components = new List<SceneComponentContainer>()
+            };
+
+            // SceneContainer
+            //  - List<SceneNodeContainer>
+            //      - myCubeNodeContainer (Children[0])
+            _canvas.Children.Add(_myCubeNodeContainer);
+
+
+            // Reihenfolge wichtig!
+            // SceneContainer
+            //  - List<SceneNodeContainer>
+            //      - myCubeNodeContainer (Children[0])
+            //          - List<SceneComponentContainer>
+            //              - myTransformComponent (List[0])
+            //              - myCubeMeshComponent(List[1])
+            _myCubeNodeContainer.Components.Add(_myTransformComponent);
+            _myCubeNodeContainer.Components.Add(_myCubeMeshComponent);
+
+            */
+
+            _canvas = new SceneContainer
+            {
+                Children = new List<SceneNodeContainer>
+                {
+                    new SceneNodeContainer
+                    {
+                        Children = new List<SceneNodeContainer>(),
+                        Components = new List<SceneComponentContainer>
+                        {
+                            //_myTransformComponent,
+                            rectTrans,
+                            _myMaterialComponent,
+                            _myCubeMeshComponent
+                        }
+                    }
+                },
+                Header = new SceneHeader
+                {
+                    CreatedBy = "Patrick",
+                    CreationDate = "10.12.2016"
+                }
+            };
+
             // Wrap a SceneRenderer around the model.           
-            _sceneRenderer = new SceneRenderer(_cube);
-            //_canvasRenderer = new SceneRenderer(_canvas);
+            //_sceneRenderer = new SceneRenderer(_cube);
+            _canvasRenderer = new SceneRenderer(_canvas);
         }
 
         public static Mesh LoadMesh(string assetName)
@@ -148,7 +248,7 @@ namespace Fusee.Engine.Examples.UITest.Core
 
             // Create the camera matrix and set it as the current ModelView transformation
             var mtxRot = float4x4.CreateRotationX(_angleVert) * float4x4.CreateRotationY(_angleHorz);
-            var mtxCam = float4x4.LookAt(0, 5, -5, 0, 0, 0, 0, 1, 0);
+            var mtxCam = float4x4.LookAt(0, 5, -30, 0, 0, 0, 0, 1, 0);
             RC.ModelView = mtxCam * mtxRot  /*_sceneScale*/;
 
             // Render the scene loaded in Init()
