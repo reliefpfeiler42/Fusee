@@ -386,8 +386,7 @@ namespace Fusee.Engine.Core
                 Width = rectTransform.Width
             };
             _state.Canvas = canvas;          
-                              
-            // TODO Width und Height in Matrix einberechnen
+                                         
            
             // absolut Left
             var aMinX = rectTransform.AnchorMinX;
@@ -409,6 +408,13 @@ namespace Fusee.Engine.Core
             var top = rectTransform.Top;
             var absTop = (canvas.Height * aMaxY) - top;
 
+            // TODO Middlepoint X
+
+            // TODO Middlepoint Y
+
+            // TODO Size X
+
+            // TODO Size Y
         }
 
         [VisitMethod]
