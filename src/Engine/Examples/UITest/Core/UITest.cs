@@ -46,7 +46,7 @@ namespace Fusee.Engine.Examples.UITest.Core
         // Init is called on startup. 
         public override void Init()
         {
-            // Set the clear color for the backbuffer to white (100% intentsity in all color channels R, G, B, A).
+            // Set the clear color for the backbuffer.
             RC.ClearColor = new float4(0.3f, 0.3f, 0.3f, 1);
             
             // RectTransformComponent Canvas
@@ -62,7 +62,7 @@ namespace Fusee.Engine.Examples.UITest.Core
             {
                 Diffuse = new MatChannelContainer
                 {
-                    Color = new float3(1.0f, 0.3f, 0.30f),
+                    Color = new float3(1.0f, 0.3f, 0.3f),
                 },
                 Specular = new SpecularChannelContainer
                 {
@@ -84,16 +84,16 @@ namespace Fusee.Engine.Examples.UITest.Core
             // RectTransformComponent Button
             _buttonRtC = new RectTransformComponent()
             {
-                Scale = new float3(1, 1, 1),
+                Scale = new float3(0.1f, 0.1f, 2f),
                 // AnchorPoints
                 AnchorMinX = 0.1f,
                 AnchorMaxX = 0.9f,
-                AnchorMaxY = 0.4f,
-                AnchorMinY = 0.8f,
+                AnchorMinY = 0.4f,
+                AnchorMaxY = 0.8f,
                 // Offsets
                 Left = 3f,
                 Right = 2f,
-                Bottom = 0f,
+                Bottom = 4f,
                 Top = 0f
             };
 
@@ -102,13 +102,13 @@ namespace Fusee.Engine.Examples.UITest.Core
             {
                 Diffuse = new MatChannelContainer
                 {
-                    Color = new float3(1.0f, 0, 0),
+                    Color = new float3(0, 1, 0),
                 },
                 Specular = new SpecularChannelContainer
                 {
                     Color = float3.One,
                     Shininess = 0.5f,
-                    Intensity = 0.8f
+                    Intensity = 0.5f
                 }
             };
 
@@ -126,12 +126,12 @@ namespace Fusee.Engine.Examples.UITest.Core
             // _canvas as root
             _canvas = new SceneContainer 
             {
-                // 
+                // Canvas node container
                 Children = new List<SceneNodeContainer> 
                 {
                     new SceneNodeContainer
                     {
-                        // Button
+                        // Button node container
                         Children = new List<SceneNodeContainer>()                   
                         {
                             new SceneNodeContainer()

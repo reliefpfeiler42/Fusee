@@ -152,6 +152,8 @@ namespace Fusee.Engine.Core
         private Animation _animation;
         private SceneContainer _sc;
 
+        private CanvasData _canvas;
+
         private RenderContext _rc;
         private List<LightInfo> _lights;
 
@@ -380,41 +382,74 @@ namespace Fusee.Engine.Core
             //_state.Model *= rectTransform.RectMatrix();
             //_rc.Model *= float4x4.CreateScale(rectTransform.Width, rectTransform.Height, 0);
 
-            var canvas = new CanvasData
+            
+            if (rectTransform.Width != 0 || rectTransform.Height != 0)
             {
-                Height = rectTransform.Height,
-                Width = rectTransform.Width
-            };
-            _state.Canvas = canvas;          
-                                         
+                _canvas = new CanvasData
+                {
+                    Height = rectTransform.Height,
+                    Width = rectTransform.Width
+                };
+                _state.Canvas = _canvas;
+            }
            
-            // absolut Left
-            var aMinX = rectTransform.AnchorMinX;
-            var left = rectTransform.Left;
-            var absLeft = (canvas.Width * aMinX) + left;
+            /*
+            if (rectTransform.Width == 0 || rectTransform.Height == 0)
+            {
+                rectTransform.Width = 1;
+                rectTransform.Height = 1;
+            }
+            */
 
-            // absolut Right
-            var aMaxX = rectTransform.AnchorMaxX;
-            var right = rectTransform.Right;
-            var absRight = (canvas.Width * aMaxX) - right;
+            if (rectTransform.Width == 0 || rectTransform.Height == 0)
+            {
+                // absolut Left
+                var aMinX = rectTransform.AnchorMinX;
+                var left = rectTransform.Left;
+                var absLeft = (_canvas.Width * aMinX) + left;
 
-            // absolut Bottom
-            var aMinY = rectTransform.AnchorMinY;
-            var bottom = rectTransform.Bottom;
-            var absBottom = (canvas.Height * aMinY) + bottom;
+                // absolut Right
+                var aMaxX = rectTransform.AnchorMaxX;
+                var right = rectTransform.Right;
+                var absRight = (_canvas.Width * aMaxX) - right;
 
-            // absolut Top
-            var aMaxY = rectTransform.AnchorMaxY;
-            var top = rectTransform.Top;
-            var absTop = (canvas.Height * aMaxY) - top;
+                // absolut Bottom
+                var aMinY = rectTransform.AnchorMinY;
+                var bottom = rectTransform.Bottom;
+                var absBottom = (_canvas.Height * aMinY) + bottom;
 
-            // TODO Middlepoint X
+                // absolut Top
+                var aMaxY = rectTransform.AnchorMaxY;
+                var top = rectTransform.Top;
+                var absTop = (_canvas.Height * aMaxY) - top;
 
-            // TODO Middlepoint Y
+                // Middlepoint X/Y
+                var midPtX = (absLeft + absRight) / 2;
+                var midPtY = (absBottom + absTop) / 2;
 
-            // TODO Size X
+                rectTransform.Translation = new float3(midPtX, midPtY, 0);
 
-            // TODO Size Y
+                // Size X/Y
+                var sizeX = absLeft - absRight;
+                if (sizeX < 0)
+                    sizeX *= -1;
+
+                var sizeY = absBottom - absTop;
+                if (sizeY < 0)
+                    sizeY *= -1;
+
+                rectTransform.Width = sizeX;
+                rectTransform.Height = sizeY;
+
+                // push new Width and Height values in stack
+                _canvas = new CanvasData
+                {
+                    Width = sizeX,
+                    Height = sizeY
+                };
+                _state.Canvas = _canvas;
+
+            }     
         }
 
         [VisitMethod]
