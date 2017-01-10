@@ -178,7 +178,24 @@ namespace Fusee.Engine.Core
                 set { _effect.Tos = value; }
                 get { return _effect.Tos; }
             }
+            /*
+            private StateStack<CanvasData> _canvas = new StateStack<CanvasData>();
+            public CanvasData Canvas
+            {
+                set { _canvas.Tos = value; }
+                get { return _canvas.Tos; }
+            }
+            */
+            public RendererState()
+            {
+                RegisterState(_model);
+                RegisterState(_effect);
+                //RegisterState(_canvas);
+            }
+        };
 
+        public class UiState : VisitorState
+        {
             private StateStack<CanvasData> _canvas = new StateStack<CanvasData>();
             public CanvasData Canvas
             {
@@ -186,13 +203,11 @@ namespace Fusee.Engine.Core
                 get { return _canvas.Tos; }
             }
 
-            public RendererState()
+            public UiState()
             {
-                RegisterState(_model);
-                RegisterState(_effect);
                 RegisterState(_canvas);
             }
-        };
+        }
 
         public struct CanvasData
         {
@@ -201,6 +216,7 @@ namespace Fusee.Engine.Core
         }
 
         private RendererState _state;
+        private UiState _uiState;
         private float4x4 _view;
 
         #endregion
@@ -375,13 +391,12 @@ namespace Fusee.Engine.Core
         // TODO WIP
         [VisitMethod]
         public void RenderRectTransform(RectTransformComponent rectTransform)
-        {
+        {           
             _state.Model *= rectTransform.RectMatrix();
             _rc.Model = _view * _state.Model;
 
             //_state.Model *= rectTransform.RectMatrix();
-            //_rc.Model *= float4x4.CreateScale(rectTransform.Width, rectTransform.Height, 0);
-
+            //_rc.Model *= float4x4.CreateScale(rectTransform.Width/2, rectTransform.Height/2, 1);
             
             if (rectTransform.Width != 0 || rectTransform.Height != 0)
             {
@@ -390,17 +405,9 @@ namespace Fusee.Engine.Core
                     Height = rectTransform.Height,
                     Width = rectTransform.Width
                 };
-                _state.Canvas = _canvas;
+                _uiState.Canvas = _canvas;
             }
-           
-            /*
-            if (rectTransform.Width == 0 || rectTransform.Height == 0)
-            {
-                rectTransform.Width = 1;
-                rectTransform.Height = 1;
-            }
-            */
-
+            
             if (rectTransform.Width == 0 || rectTransform.Height == 0)
             {
                 // absolut Left
@@ -426,8 +433,12 @@ namespace Fusee.Engine.Core
                 // Middlepoint X/Y
                 var midPtX = (absLeft + absRight) / 2;
                 var midPtY = (absBottom + absTop) / 2;
+                Debug.WriteLine("new middle X:" + midPtX);
+                Debug.WriteLine("new middle Y:" + midPtY);
 
-                rectTransform.Translation = new float3(midPtX, midPtY, 0);
+                // TODO neuer Mittelpunkt muss zum Canvas liegen, nicht zur Worldspace!!!!
+                //rectTransform.Translation = new float3(midPtX, midPtY, 0);
+                rectTransform.Translation = new float3(0, 0, 0);
 
                 // Size X/Y
                 var sizeX = absLeft - absRight;
@@ -447,8 +458,28 @@ namespace Fusee.Engine.Core
                     Width = sizeX,
                     Height = sizeY
                 };
-                _state.Canvas = _canvas;
+                _uiState.Canvas = _canvas;
+                
+                
+                // save new values
+                var widthNew = _uiState.Canvas.Width;
+                var heightNew = _uiState.Canvas.Height;
+                
+                _uiState.Pop();
 
+                // save old values
+                var widthOld = _uiState.Canvas.Width;
+                var heightOld = _uiState.Canvas.Height;
+                
+                // save new values back to TOS
+                _canvas = new CanvasData
+                {
+                    Width = widthNew,
+                    Height = heightNew
+                };
+                _uiState.Canvas = _canvas;
+               
+               
             }     
         }
 
@@ -489,17 +520,24 @@ namespace Fusee.Engine.Core
             _view = _rc.ModelView;
 
             _state.Effect = _defaultEffect;
+
+            _uiState = new UiState();
+            _uiState.Clear();
+            _uiState.Canvas = _canvas;
         }
 
         protected override void PushState()
         {
             _state.Push();
+            _uiState.Push();
         }
 
         protected override void PopState()
         {
             _state.Pop();
-            _rc.ModelView = _view * _state.Model;
+            _rc.ModelView = _view * _state.Model;       
+            _uiState.Pop();
+               
         }
         #endregion
 

@@ -53,8 +53,8 @@ namespace Fusee.Engine.Examples.UITest.Core
             _canvasRtC = new RectTransformComponent
             {
                 Scale = new float3(1, 1, 0.1f),
-                Width = 10f,
-                Height = 5f
+                Width = 12f,
+                Height = 7f
             };
 
             // MaterialComponent Canvas
@@ -84,7 +84,7 @@ namespace Fusee.Engine.Examples.UITest.Core
             // RectTransformComponent Button
             _buttonRtC = new RectTransformComponent()
             {
-                Scale = new float3(0.1f, 0.1f, 2f),
+                Scale = new float3(1, 1, 0.1f),
                 // AnchorPoints
                 AnchorMinX = 0.1f,
                 AnchorMaxX = 0.9f,
@@ -122,7 +122,7 @@ namespace Fusee.Engine.Examples.UITest.Core
             };
             
                   
-            // add all components together 
+            // add all components
             // _canvas as root
             _canvas = new SceneContainer 
             {
