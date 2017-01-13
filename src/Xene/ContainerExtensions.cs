@@ -24,6 +24,7 @@ namespace Fusee.Xene
                    float4x4.CreateScale(tcThis.Scale);
         }
 
+        /*
         /// <summary>
         /// Calculates a transformation matrix from this rect transform component.
         /// </summary>
@@ -37,6 +38,7 @@ namespace Fusee.Xene
                    float4x4.CreateRotationX(rtcThis.Rotation.x) * float4x4.CreateRotationZ(rtcThis.Rotation.z) *
                    float4x4.CreateScale(rtcThis.Scale) * float4x4.CreateScale(new float3(rtcThis.Width, rtcThis.Height, 1));
         }
+        */
 
         /// <summary>
         /// Finds the component with the specified type in this scene node container.

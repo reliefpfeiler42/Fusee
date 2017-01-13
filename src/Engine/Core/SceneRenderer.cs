@@ -152,8 +152,6 @@ namespace Fusee.Engine.Core
         private Animation _animation;
         private SceneContainer _sc;
 
-        private CanvasData _canvas;
-
         private RenderContext _rc;
         private List<LightInfo> _lights;
 
@@ -178,19 +176,19 @@ namespace Fusee.Engine.Core
                 set { _effect.Tos = value; }
                 get { return _effect.Tos; }
             }
-            /*
+            
             private StateStack<CanvasData> _canvas = new StateStack<CanvasData>();
             public CanvasData Canvas
             {
                 set { _canvas.Tos = value; }
                 get { return _canvas.Tos; }
             }
-            */
+            
             public RendererState()
             {
                 RegisterState(_model);
                 RegisterState(_effect);
-                //RegisterState(_canvas);
+                RegisterState(_canvas);
             }
         };
 
@@ -213,10 +211,11 @@ namespace Fusee.Engine.Core
         {
             public float Width;
             public float Height;
+            public bool IsChild;
         }
 
         private RendererState _state;
-        private UiState _uiState;
+        //private UiState _uiState;
         private float4x4 _view;
 
         #endregion
@@ -391,97 +390,162 @@ namespace Fusee.Engine.Core
         // TODO WIP
         [VisitMethod]
         public void RenderRectTransform(RectTransformComponent rectTransform)
-        {           
-            _state.Model *= rectTransform.RectMatrix();
-            _rc.Model = _view * _state.Model;
-
-            //_state.Model *= rectTransform.RectMatrix();
-            //_rc.Model *= float4x4.CreateScale(rectTransform.Width/2, rectTransform.Height/2, 1);
-            
-            if (rectTransform.Width != 0 || rectTransform.Height != 0)
+        {
+            float2 size, lastSize;
+            float2 center, lastCenter;
+            if (!_state.Canvas.IsChild)
             {
-                _canvas = new CanvasData
-                {
-                    Height = rectTransform.Height,
-                    Width = rectTransform.Width
-                };
-                _uiState.Canvas = _canvas;
+                lastSize = new float2(1, 1);
+                lastCenter = float2.Zero;
+                size = new float2(rectTransform.AnchorMaxX - rectTransform.AnchorMinX,
+                    rectTransform.AnchorMaxY - rectTransform.AnchorMinY);
+                center = 0.5f * new float2(rectTransform.AnchorMaxX + rectTransform.AnchorMinX,
+                             rectTransform.AnchorMaxY + rectTransform.AnchorMinY);
             }
-            
-            if (rectTransform.Width == 0 || rectTransform.Height == 0)
+            else
             {
+                lastSize = new float2(_state.Canvas.Width, _state.Canvas.Height);
+                lastCenter = 0.5f * lastSize;
                 // absolut Left
                 var aMinX = rectTransform.AnchorMinX;
                 var left = rectTransform.Left;
-                var absLeft = (_canvas.Width * aMinX) + left;
+                var absLeft = (_state.Canvas.Width * aMinX) + left;
 
                 // absolut Right
                 var aMaxX = rectTransform.AnchorMaxX;
                 var right = rectTransform.Right;
-                var absRight = (_canvas.Width * aMaxX) - right;
+                var absRight = (_state.Canvas.Width * aMaxX) - right;
 
                 // absolut Bottom
                 var aMinY = rectTransform.AnchorMinY;
                 var bottom = rectTransform.Bottom;
-                var absBottom = (_canvas.Height * aMinY) + bottom;
+                var absBottom = (_state.Canvas.Height * aMinY) + bottom;
 
                 // absolut Top
                 var aMaxY = rectTransform.AnchorMaxY;
                 var top = rectTransform.Top;
-                var absTop = (_canvas.Height * aMaxY) - top;
+                var absTop = (_state.Canvas.Height * aMaxY) - top;
 
                 // Middlepoint X/Y
-                var midPtX = (absLeft + absRight) / 2;
-                var midPtY = (absBottom + absTop) / 2;
-                Debug.WriteLine("new middle X:" + midPtX);
-                Debug.WriteLine("new middle Y:" + midPtY);
+                center.x = (absLeft + absRight) / 2;
+                center.y = (absBottom + absTop) / 2;
 
-                // TODO neuer Mittelpunkt muss zum Canvas liegen, nicht zur Worldspace!!!!
-                //rectTransform.Translation = new float3(midPtX, midPtY, 0);
-                rectTransform.Translation = new float3(0, 0, 0);
+                size.x = absRight - absLeft;
+                size.y = absTop - absBottom;
+            }
 
-                // Size X/Y
-                var sizeX = absLeft - absRight;
-                if (sizeX < 0)
-                    sizeX *= -1;
 
-                var sizeY = absBottom - absTop;
-                if (sizeY < 0)
-                    sizeY *= -1;
+            // Create a model matrix transforming the contents of x:[-1, 1]; y:[-1, 1] to the
+            // calculated size and center position.
+            _state.Model *=  
+                // First undo scale from parent RectTransform
+                float4x4.CreateScale(1.0f / lastSize.x, 1.0f / lastSize.y, 1.0f)
 
-                rectTransform.Width = sizeX;
-                rectTransform.Height = sizeY;
-
-                // push new Width and Height values in stack
-                _canvas = new CanvasData
-                {
-                    Width = sizeX,
-                    Height = sizeY
-                };
-                _uiState.Canvas = _canvas;
+                // Then position at center
+                * float4x4.CreateTranslation(center.x - lastCenter.x, center.y - lastCenter.y, rectTransform.PosZ)
                 
-                
-                // save new values
-                var widthNew = _uiState.Canvas.Width;
-                var heightNew = _uiState.Canvas.Height;
-                
-                _uiState.Pop();
+                // ...and scale to new size
+                * float4x4.CreateScale(size.x, size.y, 1.0f);
 
-                // save old values
-                var widthOld = _uiState.Canvas.Width;
-                var heightOld = _uiState.Canvas.Height;
-                
-                // save new values back to TOS
-                _canvas = new CanvasData
-                {
-                    Width = widthNew,
-                    Height = heightNew
-                };
-                _uiState.Canvas = _canvas;
-               
-               
-            }     
+            _rc.Model = _view * _state.Model;
+
+            _state.Canvas = new CanvasData
+            {
+                Width = size.x,
+                Height = size.y,
+                IsChild = true,
+            };
         }
+
+        /*
+                    /////////////////////////////////////////////////////           
+                    _state.Model *= rectTransform.RectMatrix();
+                    _rc.Model = _view * _state.Model;
+        
+                    //_state.Model *= rectTransform.RectMatrix();
+                    //_rc.Model *= float4x4.CreateScale(rectTransform.Width/2, rectTransform.Height/2, 1);
+                    
+                    if (rectTransform.Width != 0 || rectTransform.Height != 0)
+                    {
+                        _canvas = new CanvasData
+                        {
+                            Height = rectTransform.Height,
+                            Width = rectTransform.Width
+                        };
+                        _state.Canvas = _canvas;
+                    }
+                    
+                    if (rectTransform.Width == 0 || rectTransform.Height == 0)
+                    {
+                        // absolut Left
+                        var aMinX = rectTransform.AnchorMinX;
+                        var left = rectTransform.Left;
+                        var absLeft = (_canvas.Width * aMinX) + left;
+        
+                        // absolut Right
+                        var aMaxX = rectTransform.AnchorMaxX;
+                        var right = rectTransform.Right;
+                        var absRight = (_canvas.Width * aMaxX) - right;
+        
+                        // absolut Bottom
+                        var aMinY = rectTransform.AnchorMinY;
+                        var bottom = rectTransform.Bottom;
+                        var absBottom = (_canvas.Height * aMinY) + bottom;
+        
+                        // absolut Top
+                        var aMaxY = rectTransform.AnchorMaxY;
+                        var top = rectTransform.Top;
+                        var absTop = (_canvas.Height * aMaxY) - top;
+        
+                        // Middlepoint X/Y
+                        var midPtX = (absLeft + absRight) / 2;
+                        var midPtY = (absBottom + absTop) / 2;
+                        Debug.WriteLine("new middle X:" + midPtX);
+                        Debug.WriteLine("new middle Y:" + midPtY);
+        
+                        // TODO neuer Mittelpunkt muss zum Canvas liegen, nicht zur Worldspace!!!!
+                        //rectTransform.Translation = new float3(midPtX, midPtY, 0);
+                        rectTransform.Translation = new float3(0, 0, 0);
+        
+                        // Size X/Y
+                        var sizeX = absLeft - absRight;
+                        if (sizeX < 0)
+                            sizeX *= -1;
+        
+                        var sizeY = absBottom - absTop;
+                        if (sizeY < 0)
+                            sizeY *= -1;
+        
+                        rectTransform.Width = sizeX;
+                        rectTransform.Height = sizeY;
+        
+                        // push new Width and Height values in stack
+                        _canvas = new CanvasData
+                        {
+                            Width = sizeX,
+                            Height = sizeY
+                        };
+                        _state.Canvas = _canvas;
+                        
+                        
+                        // save new values
+                        var widthNew = _state.Canvas.Width;
+                        var heightNew = _state.Canvas.Height;
+        
+                        //_state.Pop();
+        
+                        // save old values
+                        var widthOld = _state.Canvas.Width;
+                        var heightOld = _state.Canvas.Height;
+                        
+                        // save new values back to TOS
+                        _canvas = new CanvasData
+                        {
+                            Width = widthNew,
+                            Height = heightNew
+                        };
+                        _state.Canvas = _canvas;
+                       */
 
         [VisitMethod]
         public void RenderMaterial(MaterialComponent matComp)
@@ -520,23 +584,24 @@ namespace Fusee.Engine.Core
             _view = _rc.ModelView;
 
             _state.Effect = _defaultEffect;
-
+            /*
             _uiState = new UiState();
             _uiState.Clear();
             _uiState.Canvas = _canvas;
+            */
         }
 
         protected override void PushState()
         {
             _state.Push();
-            _uiState.Push();
+            //_uiState.Push();
         }
 
         protected override void PopState()
         {
             _state.Pop();
             _rc.ModelView = _view * _state.Model;       
-            _uiState.Pop();
+            //_uiState.Pop();
                
         }
         #endregion

@@ -13,7 +13,8 @@ namespace Fusee.Serialization
     [ProtoContract]
     public class RectTransformComponent : SceneComponentContainer
     {
-        /// <summary>
+        /*
+       /// <summary>
         /// The translation (position) of the node.
         /// </summary>
         [ProtoMember(1)]
@@ -31,7 +32,7 @@ namespace Fusee.Serialization
         [ProtoMember(3)]
         public float3 Scale;
 
-        /// <summary>
+         /// <summary>
         /// The width (size) of the node.
         /// </summary>
         [ProtoMember(4)]
@@ -43,6 +44,13 @@ namespace Fusee.Serialization
         [ProtoMember(5)]
         public float Height;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        [ProtoMember(13)]
+        public float2 Pivot;
+
+        */
         /// <summary>
         /// 
         /// </summary>
@@ -97,10 +105,5 @@ namespace Fusee.Serialization
         [ProtoMember(12)]
         public float PosZ;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        [ProtoMember(13)]
-        public float2 Pivot;
     }
 }
