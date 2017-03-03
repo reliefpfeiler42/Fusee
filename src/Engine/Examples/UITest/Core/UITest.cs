@@ -28,14 +28,22 @@ namespace Fusee.Engine.Examples.UITest.Core
 
         private Cube _canvasCube;
         private Cube _buttonCube;
+        private Cube _textCube;
 
+        private TransformComponent _canvasTC;
         private RectTransformComponent _canvasRtC;
         private MaterialComponent _canvasMatC;
         private MeshComponent _canvasMeshC;
 
+        private TransformComponent _buttonTC;
         private RectTransformComponent _buttonRtC;
         private MaterialComponent _buttonMatC;
         private MeshComponent _buttonMeshC;
+
+        private TransformComponent _textTC;
+        private RectTransformComponent _textRtC;
+        private MaterialComponent _textMatC;
+        private MeshComponent _textMeshC;
 
         private SceneContainer _canvas;
         //private SceneNodeContainer _myCubeNodeContainer;
@@ -48,16 +56,25 @@ namespace Fusee.Engine.Examples.UITest.Core
         {
             // Set the clear color for the backbuffer.
             RC.ClearColor = new float4(0.3f, 0.3f, 0.3f, 1);
-            
+
+            var scale = new float3(1, 1, 0.01f);
+            var trans = new float3(0, 0, -0.5f);
+
+            // TransformComponent Canvas
+            _canvasTC = new TransformComponent
+            {
+                Scale = scale,
+                Rotation = float3.Zero,
+                Translation = float3.Zero
+            };
+
             // RectTransformComponent Canvas
             _canvasRtC = new RectTransformComponent
             {
                 AnchorMinX = 0,
                 AnchorMaxX = 10,
                 AnchorMinY = 0,
-                AnchorMaxY = 5
-                 
-
+                AnchorMaxY = 5                
             };
 
             // MaterialComponent Canvas
@@ -84,6 +101,13 @@ namespace Fusee.Engine.Examples.UITest.Core
                 Normals = _canvasCube.Normals
             };
 
+            _buttonTC = new TransformComponent
+            {
+                Scale = float3.One,
+                Rotation = float3.Zero,
+                Translation = trans
+            };
+
             // RectTransformComponent Button
             _buttonRtC = new RectTransformComponent()
             {
@@ -93,10 +117,10 @@ namespace Fusee.Engine.Examples.UITest.Core
                 AnchorMinY = 0.4f,
                 AnchorMaxY = 0.8f,
                 // Offsets
-                Left = 3f,
-                Right = 2f,
-                Bottom = 0f,
-                Top = 0f
+                Left = 3,
+                Right = 2,
+                Bottom = 0,
+                Top = 0
             };
 
             // MaterialComponent Button
@@ -122,8 +146,54 @@ namespace Fusee.Engine.Examples.UITest.Core
                 Triangles = _buttonCube.Triangles,
                 Normals = _buttonCube.Normals
             };
-            
-                  
+
+            _textTC = new TransformComponent
+            {
+                Scale = float3.One,
+                Rotation = float3.Zero,
+                Translation = trans
+            };
+
+            // RectTransformComponent Text
+            _textRtC = new RectTransformComponent()
+            {
+                // AnchorPoints
+                AnchorMinX = 0.5f,
+                AnchorMaxX = 0.5f,
+                AnchorMinY = 0.5f,
+                AnchorMaxY = 0.5f,
+                // Offsets
+                Left = 0.8f,
+                Right = 0.8f,
+                Bottom = 0.3f,
+                Top = 0.3f
+            };
+
+            // MaterialComponent Text
+            _textMatC = new MaterialComponent()
+            {
+                Diffuse = new MatChannelContainer
+                {
+                    Color = new float3(1, 0, 0),
+                },
+                Specular = new SpecularChannelContainer
+                {
+                    Color = float3.One,
+                    Shininess = 0.5f,
+                    Intensity = 0.5f
+                }
+            };
+
+            // MeshComponent Text
+            _textCube = new Cube();
+            _textMeshC = new MeshComponent()
+            {
+                Vertices = _textCube.Vertices,
+                Triangles = _textCube.Triangles,
+                Normals = _textCube.Normals
+            };
+
+
             // add all components
             // _canvas as root
             _canvas = new SceneContainer 
@@ -138,9 +208,24 @@ namespace Fusee.Engine.Examples.UITest.Core
                         {
                             new SceneNodeContainer()
                             {
-                                Children = new List<SceneNodeContainer>(), // ("Text" - Children, zZ null) 
+                                Children = new List<SceneNodeContainer>()
+                                {
+                                    new SceneNodeContainer()
+                                    {
+                                        // ("Text" - Children, zZ null) 
+                                        Children = new List<SceneNodeContainer>(),
+                                        Components = new List<SceneComponentContainer>()
+                                        {
+                                            _textTC,
+                                            _textRtC,
+                                            _textMatC,
+                                            _textMeshC
+                                        }
+                                    }
+                                }, 
                                 Components = new List<SceneComponentContainer>()
                                 {
+                                    _buttonTC,
                                     _buttonRtC,
                                     _buttonMatC,
                                     _buttonMeshC
@@ -149,6 +234,7 @@ namespace Fusee.Engine.Examples.UITest.Core
                         },
                         Components = new List<SceneComponentContainer>
                         {
+                            _canvasTC,
                             _canvasRtC,
                             _canvasMatC,
                             _canvasMeshC
@@ -162,59 +248,10 @@ namespace Fusee.Engine.Examples.UITest.Core
                 }
             };
 
-            /*
-            // Neuer SceneContainer - root element
-            _canvas = new SceneContainer
-            {
-                Children = new List<SceneNodeContainer>(),
-                Header = new SceneHeader
-                {
-                    CreatedBy = "Patrick",
-                    CreationDate = "10.12.2016"
-                }
-            };
-
-            // Neuer SceneNodeContainer
-            _myCubeNodeContainer = new SceneNodeContainer
-            {
-                Components = new List<SceneComponentContainer>()
-            };
-
-            // SceneContainer
-            //  - List<SceneNodeContainer>
-            //      - myCubeNodeContainer (Children[0])
-            _canvas.Children.Add(_myCubeNodeContainer);
-
-
-            // Reihenfolge wichtig!
-            // SceneContainer
-            //  - List<SceneNodeContainer>
-            //      - myCubeNodeContainer (Children[0])
-            //          - List<SceneComponentContainer>
-            //              - myTransformComponent (List[0])
-            //              - myCubeMeshComponent(List[1])
-            _myCubeNodeContainer.Components.Add(_rectTransform);
-            _myCubeNodeContainer.Components.Add(_myCubeMeshComponent);
-
-            */
-
+            
             // Wrap a SceneRenderer around the model.           
             _canvasRenderer = new SceneRenderer(_canvas); 
         }
-
-        /*
-        public static Mesh LoadMesh(string assetName)
-        {
-            SceneContainer sc = AssetStorage.Get<SceneContainer>(assetName);
-            MeshComponent mc = sc.Children.FindComponents<MeshComponent>(c => true).First();
-            return new Mesh
-            {
-                Vertices = mc.Vertices,
-                Normals = mc.Normals,
-                Triangles = mc.Triangles
-            };
-        }
-        */
 
         // RenderAFrame is called once a frame
         public override void RenderAFrame()
@@ -244,30 +281,33 @@ namespace Fusee.Engine.Examples.UITest.Core
             }
             else
             {
-                if (_keys)
-                {
-                    _angleVelHorz = -RotationSpeed * Keyboard.LeftRightAxis * DeltaTime;
-                    _angleVelVert = -RotationSpeed * Keyboard.UpDownAxis * DeltaTime;
-                }
-                else
-                {
-                    var curDamp = (float)System.Math.Exp(-Damping * DeltaTime);
-                    _angleVelHorz *= curDamp;
-                    _angleVelVert *= curDamp;
-                }
+                var curDamp = (float)System.Math.Exp(-Damping * DeltaTime);
+                _angleVelHorz *= curDamp;
+                _angleVelVert *= curDamp;
             }
 
             _angleHorz += _angleVelHorz;
             _angleVert += _angleVelVert;
 
+            if (Keyboard.GetKey(KeyCodes.Left))
+                _canvasRtC.AnchorMaxX -= 0.1f;               
+            
+            if (Keyboard.GetKey(KeyCodes.Right))
+                _canvasRtC.AnchorMaxX += 0.1f;
+
+            if (Keyboard.GetKey(KeyCodes.Up))
+                _canvasRtC.AnchorMaxY += 0.1f;
+
+            if (Keyboard.GetKey(KeyCodes.Down))
+                _canvasRtC.AnchorMaxY -= 0.1f;          
+
+
             // Create the camera matrix and set it as the current ModelView transformation
             var mtxRot = float4x4.CreateRotationX(_angleVert) * float4x4.CreateRotationY(_angleHorz);
-            var mtxCam = float4x4.LookAt(0, 5, -30, 0, 0, 0, 0, 1, 0);
+            var mtxCam = float4x4.LookAt(0, 7, -15, 5, 0, 0, 0, 1, 0);
             RC.ModelView = mtxCam * mtxRot  /*_sceneScale*/;
 
-            // Render the scene loaded in Init()
-            //_sceneRenderer.Render(RC);
-            //_sceneRenderer.Traverse();
+            // Render the scene loaded in Init()            
             _canvasRenderer.Render(RC);
             
 

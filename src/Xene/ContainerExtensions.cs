@@ -24,22 +24,6 @@ namespace Fusee.Xene
                    float4x4.CreateScale(tcThis.Scale);
         }
 
-        /*
-        /// <summary>
-        /// Calculates a transformation matrix from this rect transform component.
-        /// </summary>
-        /// <param name="rtcThis">This rect transform component.</param>
-        /// <returns>The rect transform component's translation, rotation, scale, width and height combined in a single matrix.</returns>
-        public static float4x4 RectMatrix(this RectTransformComponent rtcThis)
-        {
-            Debug.WriteLine(rtcThis.Width);
-            Debug.WriteLine(rtcThis.Height);
-            return float4x4.CreateTranslation(rtcThis.Translation) * float4x4.CreateRotationY(rtcThis.Rotation.y) *
-                   float4x4.CreateRotationX(rtcThis.Rotation.x) * float4x4.CreateRotationZ(rtcThis.Rotation.z) *
-                   float4x4.CreateScale(rtcThis.Scale) * float4x4.CreateScale(new float3(rtcThis.Width, rtcThis.Height, 1));
-        }
-        */
-
         /// <summary>
         /// Finds the component with the specified type in this scene node container.
         /// </summary>

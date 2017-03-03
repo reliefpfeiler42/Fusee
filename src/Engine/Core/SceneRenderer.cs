@@ -192,21 +192,6 @@ namespace Fusee.Engine.Core
             }
         };
 
-        public class UiState : VisitorState
-        {
-            private StateStack<CanvasData> _canvas = new StateStack<CanvasData>();
-            public CanvasData Canvas
-            {
-                set { _canvas.Tos = value; }
-                get { return _canvas.Tos; }
-            }
-
-            public UiState()
-            {
-                RegisterState(_canvas);
-            }
-        }
-
         public struct CanvasData
         {
             public float Width;
@@ -393,6 +378,7 @@ namespace Fusee.Engine.Core
         {
             float2 size, lastSize;
             float2 center, lastCenter;
+
             if (!_state.Canvas.IsChild)
             {
                 lastSize = new float2(1, 1);
@@ -410,30 +396,36 @@ namespace Fusee.Engine.Core
                 var aMinX = rectTransform.AnchorMinX;
                 var left = rectTransform.Left;
                 var absLeft = (_state.Canvas.Width * aMinX) + left;
-
+                
                 // absolut Right
                 var aMaxX = rectTransform.AnchorMaxX;
                 var right = rectTransform.Right;
                 var absRight = (_state.Canvas.Width * aMaxX) - right;
-
+                
                 // absolut Bottom
                 var aMinY = rectTransform.AnchorMinY;
                 var bottom = rectTransform.Bottom;
                 var absBottom = (_state.Canvas.Height * aMinY) + bottom;
-
+                
                 // absolut Top
                 var aMaxY = rectTransform.AnchorMaxY;
                 var top = rectTransform.Top;
                 var absTop = (_state.Canvas.Height * aMaxY) - top;
-
+                
                 // Middlepoint X/Y
                 center.x = (absLeft + absRight) / 2;
                 center.y = (absBottom + absTop) / 2;
-
+                
+                // the size of the new child
+                // if negativ must turn to positiv
                 size.x = absRight - absLeft;
-                size.y = absTop - absBottom;
-            }
+                if (size.x < 0)
+                    size.x = doPositiv(size.x);
 
+                size.y = absTop - absBottom;
+                if (size.y < 0)
+                    size.y = doPositiv(size.y);
+            }
 
             // Create a model matrix transforming the contents of x:[-1, 1]; y:[-1, 1] to the
             // calculated size and center position.
@@ -449,12 +441,18 @@ namespace Fusee.Engine.Core
 
             _rc.Model = _view * _state.Model;
 
-            _state.Canvas = new CanvasData
+             _state.Canvas = new CanvasData
             {
                 Width = size.x,
                 Height = size.y,
                 IsChild = true,
             };
+        }
+
+        public float doPositiv(float value)
+        {
+            value *= -1;
+            return value;
         }
 
         /*
